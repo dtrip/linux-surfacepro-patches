@@ -1,0 +1,23 @@
+diff --git a/drivers/gpu/drm/i915/intel_guc_submission.c b/drivers/gpu/drm/i915/intel_guc_submission.c
+index 4d2409466a3a..7d82a7127a19 100644
+--- a/drivers/gpu/drm/i915/intel_guc_submission.c
++++ b/drivers/gpu/drm/i915/intel_guc_submission.c
+@@ -349,10 +349,14 @@ static void guc_stage_desc_init(struct intel_guc *guc,
+ 	desc = __get_stage_desc(client);
+ 	memset(desc, 0, sizeof(*desc));
+ 
+-	desc->attribute = GUC_STAGE_DESC_ATTR_ACTIVE |
+-			  GUC_STAGE_DESC_ATTR_KERNEL;
+-	if (is_high_priority(client))
+-		desc->attribute |= GUC_STAGE_DESC_ATTR_PREEMPT;
++	desc->attribute = GUC_STAGE_DESC_ATTR_ACTIVE;
++	if ((client->priority == GUC_CLIENT_PRIORITY_KMD_NORMAL) ||
++			(client->priority == GUC_CLIENT_PRIORITY_KMD_HIGH)) {
++		desc->attribute  |= GUC_STAGE_DESC_ATTR_KERNEL;
++	} else {
++		desc->attribute  |= GUC_STAGE_DESC_ATTR_PCH;
++	}
++
+ 	desc->stage_id = client->stage_id;
+ 	desc->priority = client->priority;
+ 	desc->db_id = client->doorbell_id;
